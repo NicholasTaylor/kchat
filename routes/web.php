@@ -25,6 +25,10 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/chat', function () {
+    return Inertia::render('Chat/Posts');
+})->name('chat');
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

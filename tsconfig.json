@@ -12,7 +12,8 @@
         "noEmit": true,
         "paths": {
             "@/*": ["./resources/js/*"]
-        }
+        },
+        "types": ["@emotion/react/types/css-prop"],
     },
     "include": ["resources/js/**/*.ts", "resources/js/**/*.tsx", "resources/js/**/*.d.ts"]
 }

@@ -17,3 +17,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+#Sensitive
+/resources/js/Pages/Chat/PostsSample.ts
