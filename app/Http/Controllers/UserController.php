@@ -53,7 +53,11 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        return view('users.edit', [
+            'user' => $user,
+            'userRole' => $user->roles->pluck('name')->toArray(),
+            'roles' => Role::latest()->get()
+        ]);
     }
 
     /**
@@ -61,7 +65,10 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        $validated = validateUser($request);
+        $user->update($validated);
+        $user->syncRoles($request->get('role'));
+        return view('users.index');
     }
 
     /**
@@ -69,10 +76,12 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        //
+        $user->delete();
+        return view('users.index');
     }
 
-    protected function validateUser($request){
+    protected function validateUser($request)
+    {
         $request->validate([
             'username' => ['required', 'string', 'max:128', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:256', 'unique:users'],

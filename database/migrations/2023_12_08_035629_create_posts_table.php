@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('character_name', 1024)->nullable();
             $table->string('character_url', 1024)->nullable();
             $table->text('message');
-            $table->boolean('is_flooding')->default(false);
+            $table->boolean('is_hidden')->default(false);
             $table->string('ip_address', 16)->nullable()->default('255.255.255.255');            
             $table->timestamps();
         });
