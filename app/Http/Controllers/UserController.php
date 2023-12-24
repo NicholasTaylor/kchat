@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use App\Models\Preference;
 
 class UserController extends Controller
 {
@@ -82,11 +83,22 @@ class UserController extends Controller
 
     protected function validateUser($request)
     {
-        $request->validate([
+        $validateArr = [
             'username' => ['required', 'string', 'max:128', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:256', 'unique:users'],
             'password' => ['required', 'string', 'max:255', 'unique:users']
-        ]);
+        ];
+        if($request->isMethod('post')):
+            $validateArr['is_legacy'] = ['required', 'boolean'];
+            $validateArr['top_to_bottom'] = ['required', 'boolean'];
+            $validateArr['language'] = ['required', 'string', 'max:2'];
+            $validateArr['country'] = ['required', 'string', 'max:2'];
+            $validateArr['timezone'] = ['required', 'string', 'max:128'];
+            $validateArr['clock_type'] = ['required', 'integer', 'between:0,255'];
+            $validateArr['email_optin'] = ['required', 'boolean'];
+            $validateArr['menu_color'] = ['required', 'string', 'max:64'];
+        endif;
+        $request->validate($validateArr);
         return $request;
     }
 }

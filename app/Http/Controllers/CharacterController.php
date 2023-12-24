@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use App\Models\Character;
+use App\Rules\WithinMax;
+use App\Rules\Creator;
 
 class CharacterController extends Controller
 {
     public function index()
     {
-        $characters = Room::all();
+        $characters = Character::all();
         return view('characters.index', [
             'characters' => $characters
         ]);
@@ -20,6 +23,12 @@ class CharacterController extends Controller
         return view('characters.create');
     }
 
+    public function store(Request $request)
+    {
+        $character = Character::create($this->validateCharacter($request)->all());
+        return view('characters.index');
+    }
+
     public function show($id)
     {
         $character = Character::where('id', $id)->firstOrFail();
@@ -28,23 +37,32 @@ class CharacterController extends Controller
         ]);
     }
 
-    public function edit($id)
+    public function edit(Request $request)
     {
-        $character = Character::where('id', $id)->get();
+        $character = Character::where('id', $request->id)->get()->firstOrFail();
         return view('characters.edit',[
-           'character' -> $character->firstOrFail() 
+           'character' -> $character 
         ]);
     }
     
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $character = Character::where('id',$id)->get()->firstOrFail();
+        $character->update($this->validateCharacter($request)->all());
         return view('characters.edit',[
-           'character' -> $character->firstOrFail() 
+           'character' -> $character 
         ]);
     }
 
-    protected function validateCharacterUpdate($request){
+    public function destroy(Request $request){
+        $character = Character::where('id',$id)->get()->firstOrFail();
+        $character->delete();
+        return view('characters.show', [
+            'character' -> $character
+        ]);
+    }
+
+    protected function validateCharacter($request){
         $validateArr = [
             'name' => ['required', 'string', 'max:1024'],
             'race' => ['string', 'max:64'],
@@ -55,7 +73,15 @@ class CharacterController extends Controller
             'font_color' => ['string', 'max:64'],
             'img' => ['string', 'max:1024']
         ];
+        if($request()->isMethod('put')):
+            $validateArr['id'] = ['required', 'exists:characters', 'integer', new Creator];
+            $validateArr['user_id'] = ['required', 'exists:users', 'integer'];
+        else:
+            $validateArr['user_id'] = ['required', 'exists:users', 'integer', new WithinMax];
+        endif;
         $request->validate($validateArr);
+        $request['user_id'] = auth()->user()->id;
+
         return $request;
     }
 

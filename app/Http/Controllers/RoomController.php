@@ -45,6 +45,12 @@ class RoomController extends Controller
         ]);
     }
 
+    public function destroy(Request $request)
+    {
+        $room = Room::where($request->room_id,$id);
+        $room->delete();
+    }
+
     public function update(Request $request, $id)
     {
         $room = Room::where('id',$id)->get()->firstOrFail();
